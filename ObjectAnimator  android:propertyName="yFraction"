@@ -1,0 +1,29 @@
+To use ObjectAnimator on pre-Honeycomb devices add NineOldAndroids library to your project and change your imports to use com.nineoldandroids.animation.ObjectAnimator.
+
+To use percentage values in ObjectAnimator instead of getXFraction and setXFraction you have to add getYFraction and setYFraction methods like this
+
+public float getYFraction() {
+    final WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+    int height = wm.getDefaultDisplay().getHeight();
+    return (height == 0) ? 0 : getY() / (float) height;
+}
+
+public void setYFraction(float yFraction) {
+    final WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+    int height = wm.getDefaultDisplay().getHeight();
+    setY((height > 0) ? (yFraction * height) : 0);
+}
+And then you can create xml file project-folder/res/animator/move_bottom.xml like this
+
+<?xml version="1.0" encoding="utf-8"?>
+<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="500"
+    android:propertyName="yFraction"
+    android:valueFrom="0"
+    android:valueTo="0.8"
+    android:valueType="floatType" />
+Or create animation in code
+
+final LoginLayout loginLayout = (LoginLayout) findViewById(R.id.login_layout);
+final ObjectAnimator oa = ObjectAnimator.ofFloat(loginLayout, "yFraction", 0f, 0.8f);
+oa.start();
