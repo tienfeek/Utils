@@ -1,0 +1,41 @@
+ 方法一：
+ 
+ imageView.setTranslationX( getAbsX( srcView ) - getAbsX( imageView ) );
+        imageView.setTranslationY( getAbsY( srcView ) - getAbsY( imageView ) );
+        rootView.getOverlay().add( imageView );
+        imageView.animate()
+          .translationX( 0 )
+          .translationY( 0 )
+          .setInterpolator( new DecelerateInterpolator( 2 ) )
+          .setDuration( 500 );
+ 
+ private float getAbsX( View view ) {
+    if( view.getParent() == view.getRootView() ) {
+      return view.getX();
+    } else {
+      return view.getX() + getAbsX( ( View )view.getParent() );
+    }
+  }
+ 
+  private float getAbsY( View view ) {
+    if( view.getParent() == view.getRootView() ) {
+      return view.getY();
+    } else {
+      return view.getY() + getAbsY( ( View )view.getParent() );
+    }
+  }
+  
+  
+  
+  方法二： 
+  
+    Rect rect = new Rect();
+    v.getDrawingRect(rect);
+        
+    containerLL.offsetDescendantRectToMyCoords(v, rect);
+    Log.i("wanges", "rect:" + rect.top);
+    movableView.animate().translationY(-rect.top).setDuration(ANIMATION_DURATION)
+            .setInterpolator(new AccelerateInterpolator())
+            .start();
+            
+            
