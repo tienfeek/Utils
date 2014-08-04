@@ -1,0 +1,36 @@
+自定义View一般需要重写onMeasure方法，根据不同的需求onMeasure的实现也不同，如果你的View不是非常特别，都可以参考谷歌官方文档中对onMeasure的实现：
+@Override
+protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+   // Try for a width based on our minimum
+   int minw = getPaddingLeft() + getPaddingRight() + getSuggestedMinimumWidth();
+   int w = resolveSizeAndState(minw, widthMeasureSpec, 1);
+   // Whatever the width ends up being, ask for a height that would let the pie
+   // get as big as it can
+   int minh = MeasureSpec.getSize(w) - (int)mTextWidth + getPaddingBottom() + getPaddingTop();
+   int h = resolveSizeAndState(MeasureSpec.getSize(w) - (int)mTextWidth, heightMeasureSpec, 0);
+   setMeasuredDimension(w, h);
+}
+
+resolveSizeAndState()可以使你的view更像一个控件，之前一直都是按照自己的想法写onmeasure，有时出现大小跟预期的不一致，后来看了官方文档，试着把resolveSizeAndState方法运用进去，发现大小变得正常了，但是其中的resolveSizeAndState方法在新的api中才有，无法兼容3.0以下。
+
+private int resolveSizeAndState2(int size, int measureSpec, int childMeasuredState) {
+    int result = size;
+    int specMode = MeasureSpec.getMode(measureSpec);
+    int specSize =  MeasureSpec.getSize(measureSpec);
+    switch (specMode) {
+    case MeasureSpec.UNSPECIFIED:
+        result = size;
+        break;
+    case MeasureSpec.AT_MOST:
+        if (specSize < size) {
+            result = specSize | MEASURED_STATE_TOO_SMALL;
+        } else {
+            result = size;
+        }
+        break;
+    case MeasureSpec.EXACTLY:
+        result = specSize;
+        break;
+    }
+    return result | (childMeasuredState&MEASURED_STATE_MASK);
+}
